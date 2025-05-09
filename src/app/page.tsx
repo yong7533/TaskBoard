@@ -28,12 +28,12 @@
 // 1. 自動進行圖片優化（調整大小、格式轉換）
 // 2. 支持懶加載
 // 3. 防止圖片佈局偏移
-import Image from "next/image";
+import Link from "next/link";///沒用到（淡）
 
 // React 的 useState Hook
 // useState 是 React 最基本的 Hook，用於管理組件狀態
 // 格式：const [狀態變數, 設置狀態的函數] = useState(初始值)
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // 導入自定義組件
 // 組件化是 React 的核心概念之一，可以將 UI 拆分成小塊
@@ -46,17 +46,28 @@ export default function Home() {
   // =============== 狀態管理 ===============
   // useState Hook 使用解構賦值的語法
   // 1. tasks：狀態變數，存儲任務列表
-  // 2. setTasks：更新狀態的函數
-  // 3. useState([])：設置空數組作為初始值
-  const [tasks, setTasks] = useState([]);
+  // 2. setTasks："更新"狀態的函數
+  // 3. useState([])：設置"空數組"作為初始值
+  const [tasks, setTasks] = useState<{ id: number; title: string; description: string }[]>([]);
   
   // 用於管理輸入框的值
   // 1. newTask：存儲輸入框當前的值
-  // 2. setNewTask：更新輸入框值的函數
-  // 3. useState('')：設置空字符串作為初始值
+  // 2. setNewTask："更新"輸入框值的函數
+  // 3. useState('')：設置空"字符串"作為初始值
   const [newTask, setNewTask] = useState('');
 
+  const [nextId, setNextId] = useState(1);//從1開始編號的ID
+  
+  useEffect(() => {
+    const saveTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    setTasks(saveTasks);
+    const maxId = saveTasks.reduce((max: number, task: { id: number }) => Math.max(max, task.id), 0);
+    setNextId(maxId + 1);
+  }, []); // 空依賴數組表示只在組件首次渲染時執行一次
+  
+
   // =============== 事件處理函數 ===============
+  ///按下add
   // 添加新任務的函數
   // 使用箭頭函數（Arrow Function）語法
   const addTask = () => {
@@ -68,7 +79,14 @@ export default function Home() {
     // 1. ...tasks：展開現有的任務數組
     // 2. newTask：將新任務添加到數組末尾
     // 3. 創建新數組而不是修改原數組（不可變性原則）
-    const updatedTasks = [...tasks, newTask];
+
+    const newTaskObj = {
+      id: nextId, // 使用 nextId 作為任務的唯一標識
+      title: newTask, // 任務的標題
+      description: "", // 任務的描述，默認為空字符串
+    };
+
+    const updatedTasks = [...tasks, newTaskObj];
     
     // 使用 setter 函數更新狀態
     // React 會在狀態更新後重新渲染組件
@@ -79,7 +97,19 @@ export default function Home() {
     // 清空輸入框
     // 這會觸發重新渲染，但 React 會優化實際的 DOM 更新
     setNewTask("");
+
+    setNextId(nextId + 1);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    // 更新 localStorage 中的任務列表
   };
+    //filer(element,index) 方法 ：
+const handleDelete = (id: number) => {
+  // 不等於的（id）保留
+  const newTasks = tasks.filter((task) => task.id !== id);
+      setTasks(newTasks);
+      localStorage.setItem('tasks', JSON.stringify(newTasks));
+      // 更新 localStorage 中的任務列表
+    }
 
   // =============== 渲染 UI ===============
   // return 語句後的 JSX 代碼
@@ -88,7 +118,7 @@ export default function Home() {
     // className 使用 Tailwind CSS 的工具類
     // Tailwind CSS 是一個實用程序優先的 CSS 框架
     // 學習資源：https://tailwindcss.com/docs
-    <main className="p-4">
+    <main className="p-4 max-w-md mx-auto">
       {/* JSX 中的注釋需要使用這種格式 */}
       <h1 className="text-2xl font-bold">Task Board</h1>
 
@@ -127,7 +157,7 @@ export default function Home() {
         2. 單向數據流：父組件 → 子組件
         3. 組件通信的基本方式
       */}
-      <TaskList tasks={tasks} />
+      <TaskList tasks={tasks} onDelete = {handleDelete} />
     </main>
   );
 }
@@ -138,3 +168,20 @@ export default function Home() {
 // 3. TypeScript 文檔：https://www.typescriptlang.org
 // 4. Tailwind CSS 文檔：https://tailwindcss.com
 // 5. React Hooks 詳解：https://react.dev/reference/react
+
+
+/*
+functionFN(){
+  const[sum,setSum] = useState(0); //運算
+
+  setSum(a+b);
+
+  return(     //結果
+    <>
+      <p>(sum)</p>
+      <input>(a)</input>
+      <input>(b)</input>
+    </>
+  )
+}
+*/

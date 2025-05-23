@@ -92,9 +92,9 @@ export default function Home() {
     // 更新 localStorage 中的任務列表
   };
     //filer(element,index) 方法 ：
-const handleDelete = (id: number) => {
-  // 不等於的（id）保留
-  const newTasks = tasks.filter((task) => task.id !== id);
+const handleDelete = (deletedId:number) => {
+  // 不等於的（deletedId）保留
+  const newTasks = tasks.filter((task) => task.id !== deletedId);
       setTasks(newTasks);
       localStorage.setItem('tasks', JSON.stringify(newTasks));
       // 更新 localStorage 中的任務列表

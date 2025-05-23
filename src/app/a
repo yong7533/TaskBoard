@@ -1,0 +1,9 @@
+nww753396-4d070df4-9305-4cd5
+5c290921-dbaa-4f37-bea8-7b0a83828dd2
+
+curl --request POST \
+     --url 'https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token' \
+     --header 'content-type: application/x-www-form-urlencoded' \
+     --data grant_type=client_credentials \
+     --data client_id=nww753396-4d070df4-9305-4cd5 \
+     --data client_secret=5c290921-dbaa-4f37-bea8-7b0a83828dd2 \
